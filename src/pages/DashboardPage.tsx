@@ -32,9 +32,9 @@ export default function DashboardPage() {
         }
 
         const empList = Array.isArray(emp.data) ? emp.data : (emp.data as any).results || [];
-        const leaveList = Array.isArray(leave.data) ? leave.data : leave.data.results || [];
-        const payrollList = Array.isArray(payroll.data) ? payroll.data : payroll.data.results || [];
-        const compList = Array.isArray(companies.data) ? companies.data : companies.data.results || [];
+        const leaveList = Array.isArray(leave.data) ? leave.data : (leave.data as any).results || [];
+        const payrollList = Array.isArray(payroll.data) ? payroll.data : (payroll.data as any).results || [];
+        const compList = companiesData;
 
         setStats({
           totalEmployees: empList.length,
