@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { employeesApi } from "@/lib/employeesApi";
+import { attendanceApi } from "@/lib/attendanceApi"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -8,7 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { User, Briefcase, Phone, Mail, MapPin, Calendar, Building2, DollarSign, Download } from "lucide-react";
 import { toast } from "sonner";
-
+import { dateToWords } from "@/lib/utils";
+import { payrollApi } from "@/lib/payrollApi";
 const statusColor = (s: string) => {
   switch (s?.toLowerCase()) {
     case "present": return "bg-success/10 text-success border-success/20";
@@ -30,11 +32,15 @@ export default function EmployeeDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [employee, setEmployee] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-
+const [attendance, setAttendance] = useState<any[]>([]);
+const [payslip ,setPayslip] = useState<any[]>([]);
+  
+  
   useEffect(() => {
     const load = async () => {
       try {
-        const { data } = await employeesApi.get(Number(id));
+        const { data } = await employeesApi.get(id);
+        
         setEmployee(data);
       } catch { toast.error("Failed to load employee"); }
       setLoading(false);
@@ -45,9 +51,32 @@ export default function EmployeeDetailPage() {
   if (loading) return <div className="flex items-center justify-center h-64 text-muted-foreground">Loading...</div>;
   if (!employee) return <div className="text-center py-16 text-muted-foreground">Employee not found</div>;
 
-  const attendance = employee.attendance || [];
+ const handleAttendance = async () => {
+  try {
+    const { data } = await attendanceApi.get(id);
+
+    setAttendance(Array.isArray(data) ? data : data.results || []);
+  } catch {
+    toast.error("Failed to load attendance");
+  }
+};
+
+
+
+ const handleEmployeepayslips = async () => {
+  try {
+    
+    const { data } = await payrollApi.listEmployeepayslip(id);
+    console.log("data",data)
+setPayslip(Array.isArray(data) ? data : data.results || []);
+  } catch {
+    toast.error("Failed to load payslips");
+  }
+};
+
+
   const leaves = employee.leave || employee.leaves || [];
-  const payroll = employee.payroll || [];
+  
 
   return (
     <div className="space-y-6">
@@ -56,9 +85,9 @@ export default function EmployeeDetailPage() {
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="attendance">Attendance</TabsTrigger>
+          <TabsTrigger onClick={handleAttendance} value="attendance">Attendance</TabsTrigger>
           <TabsTrigger value="leave">Leave History</TabsTrigger>
-          <TabsTrigger value="payroll">Payroll</TabsTrigger>
+          <TabsTrigger onClick={handleEmployeepayslips} value="payslip">Payslips</TabsTrigger>
         </TabsList>
 
         {/* OVERVIEW */}
@@ -78,9 +107,9 @@ export default function EmployeeDetailPage() {
             <Card>
               <CardHeader><CardTitle className="text-base flex items-center gap-2"><Briefcase className="h-4 w-4 text-primary" /> Employment Details</CardTitle></CardHeader>
               <CardContent className="space-y-3 text-sm">
-                <div><span className="text-muted-foreground">Company</span><p className="font-medium flex items-center gap-1"><Building2 className="h-3 w-3" />{employee.company_name || employee.company || "—"}</p></div>
-                <div><span className="text-muted-foreground">Department</span><p className="font-medium">{employee.department || "—"}</p></div>
-                <div><span className="text-muted-foreground">Position</span><p className="font-medium">{employee.position || "—"}</p></div>
+                <div><span className="text-muted-foreground">Company</span><p className="font-medium flex items-center gap-1"><Building2 className="h-3 w-3" />{employee.company_detail || employee.company || "—"}</p></div>
+                <div><span className="text-muted-foreground">Department</span><p className="font-medium">{employee.department_detail || "—"}</p></div>
+                <div><span className="text-muted-foreground">Position</span><p className="font-medium">{employee.position_detail || "—"}</p></div>
                 <div><span className="text-muted-foreground">Hire Date</span><p className="font-medium">{employee.hire_date || "—"}</p></div>
                 <div><span className="text-muted-foreground">Status</span>
                   <Badge variant={employee.is_active !== false ? "default" : "secondary"}>{employee.is_active !== false ? "Active" : "Inactive"}</Badge>
@@ -108,18 +137,16 @@ export default function EmployeeDetailPage() {
                   <TableRow>
                     <TableHead>Date</TableHead>
                     <TableHead>Clock In</TableHead>
-                    <TableHead>Clock Out</TableHead>
-                    <TableHead>Total Hours</TableHead>
+                    
                     <TableHead>Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {attendance.map((a: any, i: number) => (
                     <TableRow key={i} className={statusColor(a.status)}>
-                      <TableCell>{a.date}</TableCell>
-                      <TableCell>{a.clock_in || "—"}</TableCell>
-                      <TableCell>{a.clock_out || "—"}</TableCell>
-                      <TableCell>{a.total_hours || "—"}</TableCell>
+                      <TableCell> {dateToWords(new Date(a.date).toLocaleDateString())}</TableCell>
+                      <TableCell>{a.clock_in_time || "—"}</TableCell>
+                      
                       <TableCell><Badge variant="outline" className={statusColor(a.status)}>{a.status}</Badge></TableCell>
                     </TableRow>
                   ))}
@@ -167,13 +194,13 @@ export default function EmployeeDetailPage() {
           </Card>
         </TabsContent>
 
-        {/* PAYROLL */}
-        <TabsContent value="payroll">
+        {/* PAYSLIP */}
+        <TabsContent value="payslip">
           <div className="grid gap-4 sm:grid-cols-3 mb-6">
             {[
-              { label: "Total Earned (YTD)", value: `$${payroll.reduce((s: number, p: any) => s + parseFloat(p.net_pay || p.amount || 0), 0).toLocaleString()}` },
-              { label: "Last Salary", value: payroll.length > 0 ? `$${parseFloat(payroll[payroll.length - 1].net_pay || payroll[payroll.length - 1].amount || 0).toLocaleString()}` : "—" },
-              { label: "Records", value: payroll.length },
+              { label: "Total Earned (YTD)", value: `$${payslip.reduce((s: number, p: any) => s + parseFloat(p.net_pay || p.amount || 0), 0).toLocaleString()}` },
+              { label: "Last Salary", value: payslip.length > 0 ? `$${parseFloat(payslip[payslip.length - 1].net_pay || payslip[payslip.length - 1].amount || 0).toLocaleString()}` : "—" },
+              { label: "Records", value: payslip.length },
             ].map((s) => (
               <Card key={s.label} className="stat-card">
                 <CardContent className="p-0">
@@ -197,7 +224,7 @@ export default function EmployeeDetailPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {payroll.map((p: any, i: number) => (
+                  {payslip.map((p: any, i: number) => (
                     <TableRow key={i}>
                       <TableCell>{p.period || p.date || "—"}</TableCell>
                       <TableCell>${parseFloat(p.basic_salary || p.amount || 0).toLocaleString()}</TableCell>
@@ -207,8 +234,8 @@ export default function EmployeeDetailPage() {
                       <TableCell><Badge variant={p.status === "paid" ? "default" : "secondary"}>{p.status || "—"}</Badge></TableCell>
                     </TableRow>
                   ))}
-                  {payroll.length === 0 && (
-                    <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No payroll records</TableCell></TableRow>
+                  {payslip.length === 0 && (
+                    <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No Payslip records</TableCell></TableRow>
                   )}
                 </TableBody>
               </Table>

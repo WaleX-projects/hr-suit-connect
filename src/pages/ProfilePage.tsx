@@ -29,7 +29,7 @@ export default function ProfilePage() {
               <div><Label className="text-muted-foreground text-xs">Last Name</Label><p className="font-medium">{user?.last_name}</p></div>
             </div>
             <div><Label className="text-muted-foreground text-xs">Email</Label><p className="font-medium flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground" />{user?.email}</p></div>
-            <div><Label className="text-muted-foreground text-xs">Role</Label><p className="font-medium flex items-center gap-2"><Shield className="h-4 w-4 text-muted-foreground" />{user?.role}</p></div>
+            <div><Label className="text-muted-foreground text-xs">Role</Label><p className="font-medium flex items-center gap-2"><Shield className="h-4 w-4 text-muted-foreground" />{user?.role === "company_admin"? "admin":user?.role }</p></div>
           </CardContent>
         </Card>
 

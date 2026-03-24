@@ -20,6 +20,8 @@ import PayrollPage from "@/pages/PayrollPage";
 import SubscriptionsPage from "@/pages/SubscriptionsPage";
 import NotificationsPage from "@/pages/NotificationsPage";
 import NotFound from "@/pages/NotFound";
+import PayrollDetailPage from "@/pages/PayrollDetailPage";
+
 
 const queryClient = new QueryClient();
 
@@ -58,6 +60,8 @@ const App = () => (
             <Route path="/attendance" element={<ProtectedRoute><AttendancePage /></ProtectedRoute>} />
             <Route path="/leave" element={<ProtectedRoute><LeavePage /></ProtectedRoute>} />
             <Route path="/payroll" element={<ProtectedRoute><PayrollPage /></ProtectedRoute>} />
+            <Route path="/payroll/:id" element={<ProtectedRoute><PayrollDetailPage /></ProtectedRoute>} />
+            
             <Route path="/subscriptions" element={<ProtectedRoute><SubscriptionsPage /></ProtectedRoute>} />
             <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />

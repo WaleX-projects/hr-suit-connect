@@ -7,3 +7,12 @@ export const employeesApi = {
   update: (id: number, data: any) => api.put(`/employees/${id}/`, data),
   deactivate: (id: number) => api.delete(`/employees/${id}/deactivate`),
 };
+
+export const departmentListApi = {
+  list: () => api.get("/department/"),
+};
+
+export const positionListApi = {
+  get: (department_id: string) =>
+    api.get(`/position/?department_id=${department_id}`),
+};

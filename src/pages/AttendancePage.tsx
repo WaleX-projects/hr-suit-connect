@@ -39,21 +39,32 @@ export default function AttendancePage() {
               <TableRow>
                 <TableHead>Employee</TableHead>
                 <TableHead>Date</TableHead>
-                <TableHead>Clock In</TableHead>
-                <TableHead>Clock Out</TableHead>
-                <TableHead>Hours</TableHead>
+                <TableHead>Time</TableHead>
+                
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
+            
               {records.map((r, i) => (
-                <TableRow key={i}>
-                  <TableCell className="font-medium">{r.employee_name || r.employee}</TableCell>
-                  <TableCell>{r.date}</TableCell>
-                  <TableCell>{r.clock_in || "—"}</TableCell>
-                  <TableCell>{r.clock_out || "—"}</TableCell>
-                  <TableCell>{r.total_hours || "—"}</TableCell>
-                  <TableCell><Badge variant={statusColor(r.status)}>{r.status}</Badge></TableCell>
+                <TableRow key={r.id ?? i}>
+                    <TableCell className="font-medium">
+                        {r.employee_name ?? "Unknown"}
+                    </TableCell>
+                    
+                    <TableCell>
+                        {new Date(r.date).toLocaleDateString()}
+                    </TableCell>
+                    
+                    <TableCell>
+                        {r.clock_in_time || "_"}
+                    </TableCell>
+                    
+                    <TableCell>
+                        <Badge variant={statusColor(r.status)}>
+                        {r.status?.toUpperCase()}
+                        </Badge>
+                    </TableCell>
                 </TableRow>
               ))}
               {records.length === 0 && <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">{loading ? "Loading..." : "No records"}</TableCell></TableRow>}
