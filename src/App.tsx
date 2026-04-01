@@ -23,6 +23,7 @@ import NotFound from "@/pages/NotFound";
 import PayrollDetailPage from "@/pages/PayrollDetailPage";
 import VerificationPage from "@/pages/VerificationPage";
 import OrganizationPage from "@/pages/OrganizationPage";
+import PositionPage from "@/pages/PositionPage";
 const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -63,6 +64,9 @@ const App = () => (
             <Route path="/payroll/:id" element={<ProtectedRoute><PayrollDetailPage /></ProtectedRoute>} />
             <Route path="/verify-account/:token" element={<VerificationPage />} />
             <Route path="/organization" element={<ProtectedRoute><OrganizationPage /></ProtectedRoute>} />
+            <Route path="/position/:id/:dept_name" element={<ProtectedRoute><PositionPage /></ProtectedRoute>} />
+               
+            
             <Route path="/subscriptions" element={<ProtectedRoute><SubscriptionsPage /></ProtectedRoute>} />
             <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />

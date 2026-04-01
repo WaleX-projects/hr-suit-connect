@@ -23,3 +23,36 @@ export const attendanceApi = {
     });
   },
 };
+
+
+export const holidayApi = {
+  // ================= GET ALL HOLIDAYS =================
+  list: () => api.get("/holidays/"),
+
+  // ================= GET BY FILTER =================
+  get: (params?: { year?: number }) =>
+    api.get("/holidays/", {
+      params: {
+        ...(params?.year && { year: params.year }),
+      },
+    }),
+
+  // ================= CREATE HOLIDAY =================
+  create: (data: {
+    name: string;
+    date: string;
+    is_global?: boolean;
+  }) => api.post("/holidays/", data),
+
+  // ================= UPDATE HOLIDAY =================
+  update: (id: number | string, data: any) =>
+    api.put(`/holidays/${id}/`, data),
+
+  // ================= PARTIAL UPDATE =================
+  patch: (id: number | string, data: any) =>
+    api.patch(`/holidays/${id}/`, data),
+
+  // ================= DELETE HOLIDAY =================
+  delete: (id: number | string) =>
+    api.delete(`/holidays/${id}/`),
+};

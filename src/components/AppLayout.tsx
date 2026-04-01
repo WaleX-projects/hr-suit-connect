@@ -1,11 +1,19 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-
+import {dashboardApi} from "@/lib/dashboardApi"
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import {
   LayoutDashboard,
@@ -23,28 +31,72 @@ import {
   X,
   Briefcase
 } from "lucide-react";
+
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/companies", label: "Companies", icon: Building2, superOnly: true },
-
-  // 👇 ADD THIS
   { to: "/organization", label: "Organization", icon: Network },
-
   { to: "/employees", label: "Employees", icon: Users },
   { to: "/attendance", label: "Attendance", icon: CalendarCheck },
-  { to: "/leave", label: "Leave", icon: CalendarOff,superOnly: true  },
+  { to: "/leave", label: "Leave", icon: CalendarOff },
   { to: "/payroll", label: "Payroll", icon: DollarSign },
-  { to: "/subscriptions", label: "Subscriptions", icon: CreditCard,superOnly: true },
-  { to: "/notifications", label: "Notifications", icon: Bell,superOnly: true  },
+  { to: "/subscriptions", label: "Subscriptions", icon: CreditCard},
+  { to: "/notifications", label: "Notifications", icon: Bell, superOnly: true },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, logout, isSuperAdmin } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  // ================= CHAT STATE =================
+  const [chatOpen, setChatOpen] = useState(false);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [input, setInput] = useState("");
+  const [loadingChat, setLoadingChat] = useState(false);
+
   const filtered = navItems.filter((n) => !n.superOnly || isSuperAdmin);
+
+  // ================= SEND MESSAGE =================
+  const sendMessage = async () => {
+  if (!input.trim()) return;
+
+  const userMessage = { role: "user", content: input };
+
+  setMessages((prev) => [...prev, userMessage]);
+  setInput("");
+  setLoadingChat(true);
+
+  try {
+    const { data } = await dashboardApi.chat({
+      message: userMessage.content,
+    });
+
+    console.log("chat response", data);
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "assistant",
+        content: data?.reply || data?.message || "No response from AI",
+      },
+    ]);
+  } catch (err) {
+    console.error(err);
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "assistant",
+        content: "Something went wrong.",
+      },
+    ]);
+  } finally {
+    setLoadingChat(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-background">
@@ -55,11 +107,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <button className="lg:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
+
             <Link to="/dashboard" className="flex items-center gap-2">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
                 <Briefcase className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-lg font-bold tracking-tight text-foreground">The Suit</span>
+              <span className="text-lg font-bold tracking-tight text-foreground">
+                The Suit
+              </span>
             </Link>
           </div>
 
@@ -87,16 +142,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold">
-                  {user?.first_name?.[0]}{user?.last_name?.[0]}
+                  {user?.first_name?.[0]}
+                  {user?.last_name?.[0]}
                 </div>
-                <span className="hidden md:inline text-sm font-medium">{user?.first_name}</span>
+                <span className="hidden md:inline text-sm font-medium">
+                  {user?.first_name}
+                </span>
               </Button>
             </DropdownMenuTrigger>
+
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem onClick={() => navigate("/profile")}>
                 <User className="mr-2 h-4 w-4" /> Profile
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { logout(); navigate("/login"); }}>
+              <DropdownMenuItem
+                onClick={() => {
+                  logout();
+                  navigate("/login");
+                }}
+              >
                 <LogOut className="mr-2 h-4 w-4" /> Logout
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -129,6 +193,68 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <main className="p-4 lg:p-8 max-w-7xl mx-auto animate-fade-in">
         {children}
       </main>
+
+      {/* ================= AI CHAT FLOAT ================= */}
+      {/*div className="fixed bottom-6 right-6 z-50">
+        <Button
+          className="rounded-full h-14 w-14 shadow-xl text-lg"
+          onClick={() => setChatOpen(true)}
+        >
+          💬
+        </Button>
+      </div>*/}
+
+      {/* ================= AI CHAT MODAL ================= */}
+      <Dialog open={chatOpen} onOpenChange={setChatOpen}>
+        <DialogContent className="max-w-lg h-[80vh] flex flex-col p-0">
+
+          <DialogHeader className="p-4 border-b">
+            <DialogTitle>AI Assistant</DialogTitle>
+          </DialogHeader>
+
+          {/* CHAT BODY */}
+          <div className="flex-1 overflow-y-auto space-y-3 p-4 bg-muted/30">
+            {messages.map((msg, i) => (
+              <div
+                key={i}
+                className={`p-3 rounded-xl text-sm max-w-[80%] ${
+                  msg.role === "user"
+                    ? "bg-primary text-white ml-auto"
+                    : "bg-white border"
+                }`}
+              >
+                {msg.role === "assistant" ? (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {msg.content}
+                  </ReactMarkdown>
+                ) : (
+                  msg.content
+                )}
+              </div>
+            ))}
+
+            {loadingChat && (
+              <div className="text-sm text-muted-foreground">
+                Thinking...
+              </div>
+            )}
+          </div>
+
+          {/* INPUT */}
+          <div className="p-3 border-t flex gap-2">
+            <Input
+              placeholder="Ask anything..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+            />
+            <Button onClick={sendMessage} disabled={loadingChat}>
+              Send
+            </Button>
+          </div>
+
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

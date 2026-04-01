@@ -280,8 +280,8 @@ const handleDeactivate = async () => {
         <TabsContent value="payslip">
           <div className="grid gap-4 sm:grid-cols-3 mb-6">
             {[
-              { label: "Total Earned (YTD)", value: `$${payslip.reduce((s: number, p: any) => s + parseFloat(p.net_salary || p.amount || 0), 0).toLocaleString()}` },
-              { label: "Last Salary", value: payslip.length > 0 ? `$${parseFloat(payslip[payslip.length - 1].net_salary|| payslip[payslip.length - 1].amount || 0).toLocaleString()}` : "—" },
+              { label: "Total Earned (YTD)", value: `₦${payslip.reduce((s: number, p: any) => s + parseFloat(p.net_salary || p.amount || 0), 0).toLocaleString()}` },
+              { label: "Last Salary", value: payslip.length > 0 ? `₦${parseFloat(payslip[payslip.length - 1].net_salary|| payslip[payslip.length - 1].amount || 0).toLocaleString()}` : "—" },
               { label: "Records", value: payslip.length },
             ].map((s) => (
               <Card key={s.label} className="stat-card">
@@ -309,10 +309,10 @@ const handleDeactivate = async () => {
                   {payslip.map((p: any, i: number) => (
                     <TableRow key={i}>
                       <TableCell>{p.payroll_month} /{p.payroll_year}</TableCell>
-                      <TableCell>${parseFloat(p.basic_salary || p.amount || 0).toLocaleString()}</TableCell>
-                      <TableCell className="text-green-600">${parseFloat(p.total_allowance || 0).toLocaleString()}</TableCell>
-                      <TableCell className="text-red-600">${parseFloat(p.total_deduction || 0).toLocaleString()}</TableCell>
-                      <TableCell className="font-semibold">${parseFloat(p.net_salary || p.amount || 0).toLocaleString()}</TableCell>
+                      <TableCell>₦{parseFloat(p.basic_salary || p.amount || 0).toLocaleString()}</TableCell>
+                      <TableCell className="text-green-600">₦{parseFloat(p.total_allowance || 0).toLocaleString()}</TableCell>
+                      <TableCell className="text-red-600">₦{parseFloat(p.total_deduction || 0).toLocaleString()}</TableCell>
+                      <TableCell className="font-semibold">₦{parseFloat(p.net_salary || p.amount || 0).toLocaleString()}</TableCell>
                       <TableCell><Badge variant={p.status === "paid" ? "default" : "secondary"}>{p.payroll_status|| "—"}</Badge></TableCell>
                     </TableRow>
                   ))}

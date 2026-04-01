@@ -8,7 +8,7 @@ export const payrollApi = {
   get: (id: string) => api.get(`/payrolls/${id}/`),
 
   // Run payroll (IMPORTANT one)
-  run: (data: { company: string; month: number; year: number }) =>
+  run: (data: { month: number; year: number }) =>
     api.post("/payrolls/run/", data),
     
   

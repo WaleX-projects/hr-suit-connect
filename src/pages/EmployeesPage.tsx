@@ -41,6 +41,8 @@ export default function EmployeesPage() {
   const [count, setCount] = useState(0);
 
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [creationLoading, setCreationLoading] = useState(false);
+  
 
   const [form, setForm] = useState({
     first_name: "",
@@ -55,7 +57,12 @@ export default function EmployeesPage() {
     bank_code: "",
     bank_account_number: ""
   });
-
+const isFormValid =
+  form.first_name &&
+  form.last_name &&
+  form.email &&
+  form.department &&
+  form.position;
   const debounceRef = useRef<any>(null);
 
   // ================= LOAD EMPLOYEES =================
@@ -187,7 +194,9 @@ export default function EmployeesPage() {
   const handleCreate = async () => {
     try {
       await employeesApi.create(form);
+      setCreationLoading(true);
       toast.success("Employee created");
+      setCreationLoading(creationLoading);
 
       setDialogOpen(false);
       setAccountName("");
@@ -209,6 +218,8 @@ export default function EmployeesPage() {
       loadEmployees();
     } catch {
       toast.error("Failed to create employee");
+    }finally{
+        setCreationLoading(false);
     }
   };
 
@@ -223,7 +234,15 @@ export default function EmployeesPage() {
   }, []);
 
   const totalPages = Math.ceil(count / pageSize);
+  
+  const handleRegistration = (id) => {
+  
 
+  window.open(
+    `https://walex-projects.github.io/Face_Scan/registration.html?token=${id}`,
+    "_blank"
+  );
+};
   return (
     <div className="space-y-6">
 
@@ -238,7 +257,7 @@ export default function EmployeesPage() {
           <DialogTrigger asChild>
             <Button><Plus className="mr-2 h-4 w-4" /> Add Employee</Button>
           </DialogTrigger>
-         <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
   <DialogHeader>
     <DialogTitle>Add Employee</DialogTitle>
   </DialogHeader>
@@ -367,9 +386,13 @@ export default function EmployeesPage() {
     </div>
 
     {/* 🔹 ACTION */}
-    <Button className="w-full" onClick={handleCreate}>
-      Create Employee
-    </Button>
+<Button
+  className="w-full"
+  onClick={handleCreate}
+  disabled={creationLoading || !isFormValid}
+>
+  {creationLoading ? "Onboarding Employee..." : "Create Employee"}
+</Button>
 
   </div>
 </DialogContent>
@@ -421,39 +444,56 @@ export default function EmployeesPage() {
           ))}
         </select>
       </div>
+{/* TABLE */}
+<Card>
+  <CardContent>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Name</TableHead>
+          <TableHead>Email</TableHead>
+          <TableHead>Position</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead />
+          <TableHead />
+        </TableRow>
+      </TableHeader>
 
-      {/* TABLE */}
-      <Card>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Position</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead />
-              </TableRow>
-            </TableHeader>
+      <TableBody>
+        {employees.map((e) => (
+          <TableRow key={e.id}>
+            <TableCell>
+              {e.first_name} {e.last_name}
+            </TableCell>
 
-            <TableBody>
-              {employees.map((e) => (
-                <TableRow key={e.id}>
-                  <TableCell>{e.first_name} {e.last_name}</TableCell>
-                  <TableCell>{e.email}</TableCell>
-                  <TableCell>{e.position_detail}</TableCell>
-                  <TableCell><Badge>{e.status}</Badge></TableCell>
-                  <TableCell>
-                    <Link to={`/employees/${e.id}`}>
-                      <Eye className="h-4 w-4" />
-                    </Link>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            <TableCell>{e.email}</TableCell>
+
+            <TableCell>{e.position_detail}</TableCell>
+
+            <TableCell>
+              <Badge>{e.status}</Badge>
+            </TableCell>
+
+            <TableCell>
+              <Link to={`/employees/${e.id}`}>
+                <Eye className="h-4 w-4" />
+              </Link>
+            </TableCell>
+
+            {/* Show button ONLY when not verified */}
+            <TableCell>
+              {!e.face_verified && (
+                <Button onClick={() => handleRegistration(e.id)}>
+                  Verify Employee Face
+                </Button>
+              )}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </CardContent>
+</Card>
 
       {/* PAGINATION */}
       <div className="flex justify-between">

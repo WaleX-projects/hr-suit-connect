@@ -56,6 +56,6 @@ export const positionApi = {
     api.get(`/position/?department_id=${department_id}`),
   
   list: () => api.get("/position/"),
-  create: (data: { title: string; department_id: string }) =>
-    api.post("/position/", data),
+  create: (data: any) =>
+  api.post("/position/", data),
 };
