@@ -390,13 +390,7 @@ export default function SettingsPage() {
               </Button>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        {/* PAYROLL, ORGANIZATION, LEAVE, NOTIFICATIONS tabs remain the same as your original code */}
-
-        {/* WORK LOCATION TAB */}
-        <TabsContent value="work-location">
-          <Card>
+           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MapPin className="h-5 w-5" /> My Work Location (Geo-fencing)
@@ -467,6 +461,13 @@ export default function SettingsPage() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* PAYROLL, ORGANIZATION, LEAVE, NOTIFICATIONS tabs remain the same as your original code */}
+
+        {/* WORK LOCATION TAB */}
+        <TabsContent value="work-location">
+         
         </TabsContent>
       </Tabs>
     </div>
