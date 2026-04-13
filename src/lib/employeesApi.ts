@@ -27,9 +27,9 @@ export const employeesApi = {
     api.put(`/employees/${id}/`, data),
 
   deactivate: (id: string) =>
-    api.patch(`/employees/${id}/deactivate/`),
+    api.patch(`/employees/${id}/deactivate/`,{}),
     activate: (id: string) =>
-    api.patch(`/employees/${id}/activate/`),
+    api.patch(`/employees/${id}/activate/`,{}),
 
   listEmployeepayslip: (employeeId: string) =>
     api.get(`/employees/${employeeId}/payslips/`),
