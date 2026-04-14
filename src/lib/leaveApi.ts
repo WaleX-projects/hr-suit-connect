@@ -43,7 +43,7 @@ export const leaveApi = {
     reason: string;
   }) => api.post<LeaveRequest>("/leave/", data),
 
-  updateStatus: (id: string, status: "approved" | "rejected") =>
+  updateStatus: (id: string, status: "approve" | "rejecte") =>
     api.post(`/leave/${id}/${status}/`),   // Use the new actions
 
   // Or keep using PUT if you prefer
