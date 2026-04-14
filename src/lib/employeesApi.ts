@@ -27,8 +27,8 @@ export const employeesApi = {
     api.put(`/employees/${id}/`, data),
 
   // employeesApi.ts
-activate : (id: string) => api.post(`/employees/${id}/activate/`),
-deactivate : (id: string) => api.post(`/employees/${id}/deactivate/`),
+activate : (id: string) => api.post(`/employees/${id}/activate/`,{}),
+deactivate : (id: string) => api.post(`/employees/${id}/deactivate/`,{}),
 
   listEmployeepayslip: (employeeId: string) =>
     api.get(`/employees/${employeeId}/payslips/`),
