@@ -73,7 +73,7 @@ export default function PayrollDetailPage() {
 
 
 
-  const handleMarkPaid = async () => {
+  const handlePayPayroll = async () => {
   try {
     await payrollApi.markPaid(id!);
     toast.success("Payroll marked as paid");
@@ -184,11 +184,12 @@ export default function PayrollDetailPage() {
 
 
 
-
 {payroll.status === "draft" && (
   <AlertDialog>
     <AlertDialogTrigger asChild>
-      <Button variant="secondary">
+      <Button
+        className="bg-amber-500 text-white hover:bg-amber-600"
+      >
         Pay Employees
       </Button>
     </AlertDialogTrigger>
@@ -212,7 +213,8 @@ export default function PayrollDetailPage() {
         </AlertDialogCancel>
 
         <AlertDialogAction
-          //onClick={handlePayPayroll}
+          onClick={handlePayPayroll}
+          className="bg-amber-500 text-white hover:bg-amber-600"
         >
           Confirm & Pay Employees
         </AlertDialogAction>
@@ -222,21 +224,27 @@ export default function PayrollDetailPage() {
 )}
 
 {payroll.status === "processing" && (
-  <Button variant="secondary" disabled>
+  <Button
+    disabled
+    className="bg-blue-500 text-white opacity-100 hover:bg-blue-500"
+  >
     Processing...
   </Button>
 )}
 
 {payroll.status === "paid" && (
-  <Button variant="secondary" disabled>
+  <Button
+    disabled
+    className="bg-green-600 text-white opacity-100 hover:bg-green-600"
+  >
     Paid
   </Button>
 )}
 
 {payroll.status === "partially_paid" && (
   <Button
-    variant="secondary"
-    //onClick={handleRetryFailedPayments}
+    className="bg-orange-500 text-white hover:bg-orange-600"
+    // onClick={handleRetryFailedPayments}
   >
     Retry Failed Payments
   </Button>
@@ -244,13 +252,12 @@ export default function PayrollDetailPage() {
 
 {payroll.status === "failed" && (
   <Button
-    variant="secondary"
-   // onClick={handleRetryFailedPayments}
+    className="bg-red-600 text-white hover:bg-red-700"
+    // onClick={handleRetryFailedPayments}
   >
     Retry Failed Payments
   </Button>
 )}
-
   {/* 
           
           <AlertDialog>
@@ -283,7 +290,7 @@ export default function PayrollDetailPage() {
       </AlertDialogCancel>
 
       <AlertDialogAction
-        onClick={handleMarkPaid}
+        onClick={handlePayPayroll}
       >
         Confirm Payment
       </AlertDialogAction>
