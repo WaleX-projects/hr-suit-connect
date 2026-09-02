@@ -180,6 +180,78 @@ export default function PayrollDetailPage() {
             Process Payroll
           </Button>*/}
       
+
+
+
+
+
+{payroll.status === "draft" && (
+  <AlertDialog>
+    <AlertDialogTrigger asChild>
+      <Button variant="secondary">
+        Pay Employees
+      </Button>
+    </AlertDialogTrigger>
+
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogTitle>
+          Pay all employees?
+        </AlertDialogTitle>
+
+        <AlertDialogDescription>
+          This will initiate payment for all employees in this payroll
+          who have a valid payment recipient. Once payment begins,
+          the payroll will be processed in the background.
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+
+      <AlertDialogFooter>
+        <AlertDialogCancel>
+          Cancel
+        </AlertDialogCancel>
+
+        <AlertDialogAction
+          //onClick={handlePayPayroll}
+        >
+          Confirm & Pay Employees
+        </AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
+)}
+
+{payroll.status === "processing" && (
+  <Button variant="secondary" disabled>
+    Processing...
+  </Button>
+)}
+
+{payroll.status === "paid" && (
+  <Button variant="secondary" disabled>
+    Paid
+  </Button>
+)}
+
+{payroll.status === "partially_paid" && (
+  <Button
+    variant="secondary"
+    //onClick={handleRetryFailedPayments}
+  >
+    Retry Failed Payments
+  </Button>
+)}
+
+{payroll.status === "failed" && (
+  <Button
+    variant="secondary"
+   // onClick={handleRetryFailedPayments}
+  >
+    Retry Failed Payments
+  </Button>
+)}
+
+  {/* 
           
           <AlertDialog>
   <AlertDialogTrigger asChild>
@@ -218,6 +290,8 @@ export default function PayrollDetailPage() {
     </AlertDialogFooter>
   </AlertDialogContent>
 </AlertDialog>
+
+*/}
           <Button variant="outline" onClick={handleExportCSV}>
             <Download className="mr-2 h-4 w-4" />
             Export CSV
